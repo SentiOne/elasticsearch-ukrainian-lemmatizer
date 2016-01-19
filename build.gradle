@@ -4,8 +4,8 @@ apply plugin: 'maven'
 
 group = 'org.sotnya'
 version = '1.0.1'
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
 
 
 description = """Ukrainian lemmatizer plugin for ElasticSearch"""

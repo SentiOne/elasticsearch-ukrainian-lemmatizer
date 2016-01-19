@@ -1,7 +1,6 @@
 package org.elasticsearch.index.analysis.ukrainian_lemmatizer;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,11 +29,11 @@ public class UkrainianLemmatizerTokenFilter extends TokenFilter {
             return false;
         }
 
-        Optional<CharSequence> lemma = lemmatizer.lemmatize(termAtt);
+        CharSequence lemma = lemmatizer.lemmatize(termAtt);
 
-        if (lemma.isPresent()) {
-            if(!keywordAttr.isKeyword() && !equalCharSequences(lemma.get(), termAtt)) {
-                termAtt.setEmpty().append(lemma.get());
+        if (lemma != null) {
+            if(!keywordAttr.isKeyword() && !equalCharSequences(lemma, termAtt)) {
+                termAtt.setEmpty().append(lemma);
             }
         }
 

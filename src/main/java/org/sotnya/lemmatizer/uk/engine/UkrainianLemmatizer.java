@@ -3,10 +3,11 @@ package org.sotnya.lemmatizer.uk.engine;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import java.io.*;
+import java.lang.RuntimeException;
+import java.lang.String;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Class to serve purposes of term-to-lemma substitution.
@@ -29,11 +30,15 @@ public class UkrainianLemmatizer {
         final String separator = ",";
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            dictionary = reader.lines()
-                    .map(line -> line.split(separator))
-                    .collect(Collectors.toMap(p -> p[0], p -> p[1]));
+            dictionary = new HashMap<String, String>();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] splittedLine = line.split(separator);
+                dictionary.put(splittedLine[0], splittedLine[1]);
+            }
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new RuntimeException("IO error while loading mapping_sorted.csv", e);
         }
 
         // Let's wait some additional second but we'll keep our heap clean from
@@ -44,15 +49,15 @@ public class UkrainianLemmatizer {
     /**
      * @param termAtt Token (word) we should compare with existing in our dictionary.
      *
-     * @return Optional value which is defined in case if we have related lemma in dict.
+     * @return CharSequence value which is not null in case if we have related lemma in dict.
      */
-    public Optional<CharSequence> lemmatize(CharTermAttribute termAtt) {
+    public CharSequence lemmatize(CharTermAttribute termAtt) {
         String term = termAtt.toString();
 
         for (Map.Entry<Character, Character> e : replaceItems.entrySet()) {
             term = term.replace(e.getKey(), e.getValue());
         }
 
-        return dictionary.containsKey(term) ? Optional.of(dictionary.get(term)) : Optional.empty();
+        return dictionary.containsKey(term) ? dictionary.get(term) : null;
     }
 }
